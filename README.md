@@ -1,39 +1,23 @@
-# Antigravity GitHub Actions SSH Server (vía tmate)
+# Antigravity GitHub Actions Terminal (vía sshx)
 
-Acceso SSH y Web Terminal instantáneo a máquinas virtuales de GitHub Actions (Ubuntu / macOS) utilizando [tmate](https://tmate.io/).
-
----
-
-## ⚡ Ventajas
-- **Sin tokens ni secrets**: No requiere cuenta en ngrok ni tokens de autenticación.
-- **Sin contraseñas**: La conexión SSH utiliza claves de sesión seguras automáticas.
-- **Terminal Web incluida**: Si no quieres usar un cliente SSH, puedes abrir la sesión directamente en cualquier navegador web.
-- **Compatible con Linux y macOS**.
+Terminal web remota colaborativa e instantánea en máquinas virtuales de GitHub Actions usando [sshx](https://sshx.io/).
 
 ---
 
-## 🚀 Cómo Iniciar la Sesión
-
-1. Ve a la pestaña **Actions** en tu repositorio: [SlidiePie/github-vm Actions](https://github.com/SlidiePie/github-vm/actions).
-2. Selecciona **Antigravity SSH Server (tmate)** en el menú izquierdo.
-3. Haz clic en **Run workflow**.
-   - Puedes seleccionar el sistema operativo (`ubuntu-latest` o `macos-latest`).
-4. Espera unos segundos y entra a la ejecución.
+## ⚡ Características
+- **Sin cuentas ni tokens**: No necesitas registrarte en ningún servicio.
+- **Acceso instantáneo por navegador**: Haz clic en el enlace `https://sshx.io/s/...` y tendrás una terminal bash completa con soporte para `sudo`.
+- **Ultra rápido**: Construido en Rust con soporte para múltiples cursores, terminales concurrentes y redimensionado fluido.
 
 ---
 
-## 🔗 Cómo Conectarte
+## 🚀 Cómo Usarlo
 
-En los logs del paso **Start tmate SSH & Web Terminal** (o en el **Summary** de la ejecución), verás los enlaces generados automáticamente:
-
-### 1. Conexión SSH (Terminal / Antigravity):
-```bash
-ssh <ID_DE_SESION>@<REGION>.tmate.io
-```
-*(No te pedirá contraseña).*
-
-### 2. Conexión por Terminal Web:
-```text
-https://tmate.io/t/<ID_DE_SESION>
-```
-*(Puedes hacer clic y usar la terminal completa directamente en tu navegador).*
+1. Ve a la pestaña **Actions** en GitHub: [SlidiePie/github-vm Actions](https://github.com/SlidiePie/github-vm/actions).
+2. Selecciona **Antigravity Terminal (sshx)** en la lista de workflows.
+3. Haz clic en **Run workflow** (puedes elegir `ubuntu-latest` o `macos-latest`).
+4. Abre la ejecución y en unos segundos verás el enlace web en la tarjeta de resumen (**Summary**) o en los logs del paso *Start sshx Web & Remote Terminal*:
+   ```text
+   https://sshx.io/s/xxxxxxxx#yyyyyyyy
+   ```
+5. Abre el enlace en tu navegador para empezar a usar la terminal inmediatamente.

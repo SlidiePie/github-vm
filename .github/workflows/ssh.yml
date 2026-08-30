@@ -1,4 +1,4 @@
-name: Antigravity SSH Server (tmate)
+name: Antigravity Terminal (sshx)
 
 on:
   workflow_dispatch:
@@ -11,10 +11,15 @@ on:
         options:
           - ubuntu-latest
           - macos-latest
+      timeout_hours:
+        description: 'Duration in hours (max 6)'
+        required: true
+        default: '6'
+        type: string
 
 jobs:
-  tmate-ssh:
-    name: SSH Session (${{ inputs.os || 'ubuntu-latest' }})
+  sshx-session:
+    name: Terminal (${{ inputs.os || 'ubuntu-latest' }})
     runs-on: ${{ inputs.os || 'ubuntu-latest' }}
     timeout-minutes: 360
 
@@ -22,8 +27,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Start tmate SSH & Web Terminal
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: false
-          connect-timeout: 360
+      - name: Start sshx Web & Remote Terminal
+        run: |
+          chmod +x scripts/start_sshx.sh
+          bash scripts/start_sshx.sh "${{ inputs.timeout_hours || '6' }}"
