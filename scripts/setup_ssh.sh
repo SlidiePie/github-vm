@@ -66,9 +66,21 @@ EOF
     fi
 
 elif [ "$OS_TYPE" = "Darwin" ]; then
-    # macOS SSH setup
-    echo "$SSH_PASS" | sudo dscl . -passwd /Users/$SSH_USER 2>/dev/null || true
-    sudo systemsetup -setremotelogin on || true
+    # macOS password setup (dscl requires password as argument, not piped via stdin)
+    sudo dscl . -passwd /Users/$SSH_USER "$SSH_PASS" 2>/dev/null || true
+    sudo sysadminctl -resetPasswordFor "$SSH_USER" -newPassword "$SSH_PASS" 2>/dev/null || true
+    
+    # Configure sudo without password for runner
+    echo "$SSH_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-runner-nopasswd > /dev/null
+    
+    # Enable Remote Login and configure sshd
+    sudo systemsetup -setremotelogin on 2>/dev/null || true
+    
+    sudo sed -i '' 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+    sudo sed -i '' 's/^#\?KbdInteractiveAuthentication .*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+    sudo sed -i '' 's/^#\?ChallengeResponseAuthentication .*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+    sudo sed -i '' 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
+    sudo sed -i '' 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
     
     # Add public key if provided
     if [ -n "$SSH_PUBLIC_KEY" ]; then
@@ -79,5 +91,10 @@ elif [ "$OS_TYPE" = "Darwin" ]; then
         chown -R $SSH_USER /Users/$SSH_USER/.ssh
         echo "Added SSH public key to authorized_keys."
     fi
-    echo "OpenSSH Server is active on macOS (port 22)."
+
+    # Restart ssh daemon
+    sudo launchctl unload /System/Library/LaunchDaemons/ssh.plist 2>/dev/null || true
+    sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist 2>/dev/null || true
+    
+    echo "✅ OpenSSH Server is active on macOS (port 22)."
 fi
