@@ -1,4 +1,4 @@
-name: Antigravity Terminal (sshx)
+name: Antigravity SSH Server
 
 on:
   workflow_dispatch:
@@ -16,10 +16,15 @@ on:
         required: true
         default: '6'
         type: string
+      ssh_password:
+        description: 'SSH Password (optional, default: antigravity)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
-  sshx-session:
-    name: Terminal (${{ inputs.os || 'ubuntu-latest' }})
+  ssh-session:
+    name: SSH Server (${{ inputs.os || 'ubuntu-latest' }})
     runs-on: ${{ inputs.os || 'ubuntu-latest' }}
     timeout-minutes: 360
 
@@ -27,7 +32,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Start sshx Web & Remote Terminal
+      - name: Setup OpenSSH Server
+        env:
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
         run: |
-          chmod +x scripts/start_sshx.sh
-          bash scripts/start_sshx.sh "${{ inputs.timeout_hours || '6' }}"
+          chmod +x scripts/setup_ssh.sh
+          USER_PASS="${{ inputs.ssh_password || secrets.SSH_PASSWORD || 'antigravity' }}"
+          bash scripts/setup_ssh.sh runner "$USER_PASS"
+
+      - name: Start SSH Tunnel (ngrok / Pinggy)
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        run: |
+          chmod +x scripts/start_tunnel.sh
+          USER_PASS="${{ inputs.ssh_password || secrets.SSH_PASSWORD || 'antigravity' }}"
+          TIMEOUT="${{ inputs.timeout_hours || '6' }}"
+          bash scripts/start_tunnel.sh "$NGROK_AUTH_TOKEN" runner "$USER_PASS" "$TIMEOUT"
