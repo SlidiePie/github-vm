@@ -1,61 +1,39 @@
-# Antigravity GitHub Actions SSH Server
+# Antigravity GitHub Actions SSH Server (vía tmate)
 
-Este repositorio te permite iniciar una máquina virtual (Linux Ubuntu o macOS) en GitHub Actions con un servidor **OpenSSH nativo** expuesto a través de **ngrok**, ideal para conectarte remotamente con **Antigravity** o terminal SSH.
-
----
-
-## 🚀 Configuración Inicial (Solo 1 vez)
-
-1. **Obtén tu token de ngrok**:
-   - Regístrate gratis en [ngrok.com](https://ngrok.com).
-   - Ve a [Your Authtoken](https://dashboard.ngrok.com/get-started/your-authtoken) y copia el token.
-
-2. **Agrega el Secret en GitHub**:
-   - En tu repositorio de GitHub, ve a **Settings** > **Secrets and variables** > **Actions**.
-   - Haz clic en **New repository secret**.
-   - Nombre: `NGROK_AUTH_TOKEN`
-   - Valor: *(pega tu token de ngrok)*
-   - *(Opcional)* Puedes agregar `SSH_PASSWORD` si deseas fijar una contraseña predeterminada diferente a `antigravity`, o `SSH_PUBLIC_KEY` para autenticación con clave pública.
+Acceso SSH y Web Terminal instantáneo a máquinas virtuales de GitHub Actions (Ubuntu / macOS) utilizando [tmate](https://tmate.io/).
 
 ---
 
-## 💻 Cómo Iniciar el Servidor SSH
+## ⚡ Ventajas
+- **Sin tokens ni secrets**: No requiere cuenta en ngrok ni tokens de autenticación.
+- **Sin contraseñas**: La conexión SSH utiliza claves de sesión seguras automáticas.
+- **Terminal Web incluida**: Si no quieres usar un cliente SSH, puedes abrir la sesión directamente en cualquier navegador web.
+- **Compatible con Linux y macOS**.
 
-1. Ve a la pestaña **Actions** en tu repositorio de GitHub.
-2. Selecciona **Antigravity SSH Server** en la lista de workflows a la izquierda.
+---
+
+## 🚀 Cómo Iniciar la Sesión
+
+1. Ve a la pestaña **Actions** en tu repositorio: [SlidiePie/github-vm Actions](https://github.com/SlidiePie/github-vm/actions).
+2. Selecciona **Antigravity SSH Server (tmate)** en el menú izquierdo.
 3. Haz clic en **Run workflow**.
    - Puedes seleccionar el sistema operativo (`ubuntu-latest` o `macos-latest`).
-   - Puedes elegir el tiempo de duración (hasta 6 horas).
-4. Espera a que el paso **Start ngrok SSH Tunnel** se ejecute (tarda ~15-20 segundos).
+4. Espera unos segundos y entra a la ejecución.
 
 ---
 
-## 🔗 Cómo Conectarte desde Antigravity / SSH
+## 🔗 Cómo Conectarte
 
-En la página de ejecución de GitHub Actions, verás una tarjeta en el resumen (**Summary**) con los datos de conexión:
+En los logs del paso **Start tmate SSH & Web Terminal** (o en el **Summary** de la ejecución), verás los enlaces generados automáticamente:
 
-### Opción 1: Comando directo por Terminal
+### 1. Conexión SSH (Terminal / Antigravity):
 ```bash
-ssh runner@0.tcp.ngrok.io -p <PUERTO>
+ssh <ID_DE_SESION>@<REGION>.tmate.io
 ```
-*Contraseña por defecto:* `antigravity`
+*(No te pedirá contraseña).*
 
-### Opción 2: Configuración en Antigravity / VS Code (`~/.ssh/config`)
-Agrega lo siguiente a tu archivo `~/.ssh/config`:
-
-```ssh-config
-Host github-vm
-    HostName 0.tcp.ngrok.io
-    Port <PUERTO>
-    User runner
+### 2. Conexión por Terminal Web:
+```text
+https://tmate.io/t/<ID_DE_SESION>
 ```
-
-Luego en Antigravity abre la paleta de comandos (`Ctrl+Shift+P` / `Cmd+Shift+P`) -> **Remote-SSH: Connect to Host...** -> Selecciona `github-vm`.
-
----
-
-## 🛠 Características
-- **Ubuntu Linux (por defecto)** o **macOS**.
-- Usuario `runner` con permisos completos de `sudo` sin contraseña.
-- Sesión mantenida activa durante todo el tiempo seleccionado (hasta 6 horas).
-- Soporte para claves públicas SSH mediante secret `SSH_PUBLIC_KEY`.
+*(Puedes hacer clic y usar la terminal completa directamente en tu navegador).*
